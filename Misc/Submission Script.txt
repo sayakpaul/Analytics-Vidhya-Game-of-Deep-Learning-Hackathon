@@ -1,0 +1,27 @@
+predictions = learner.get_preds(DatasetType.Test)
+pred_soft = F.softmax(predictions[0], dim=0)
+predIdxs = np.argmax(pred_soft.numpy(), axis=1)
+
+predIdxs = predIdxs + 1
+
+submission['category'] = predIdxs
+
+ts = time.time()
+file_name = 'submission_{}.csv'.format(ts)
+submission.to_csv('Submission_Files/'+file_name, index=False)
+
+
+# Combining predictions
+prepend = 'Submission_Files/'
+
+submission_initial = pd.read_csv(prepend+'submission_1558782906.0229204.csv')
+submission_three = pd.read_csv(prepend+'submission_1559987410.988816.csv')
+submission_four = pd.read_csv(prepend+'submission_1559989811.6190267.csv')
+
+submission_combined = submission_three.copy()
+
+submission_combined['category'] = pd.concat([submission_three.category, 
+                                             submission_four.category, submission_initial.category],
+                                             axis=1).max(axis=1)
+file_name = 'submission_{}.csv'.format(time.time())
+submission_combined.to_csv('Submission_Files/'+file_name, index=False)
